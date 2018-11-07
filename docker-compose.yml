@@ -1,0 +1,92 @@
+version: '3'
+
+services:
+
+  # ----------------------
+  #  User service 
+  # ----------------------
+  users_queue:
+    image: redis
+    ports:
+     - "6379:6379"
+    healthcheck:
+      test: exit 0
+    restart: always
+
+  users_service_db:
+    build: ./UsersService/db
+    ports:
+      - 5435:5432 # expose ports - HOST:CONTAINER
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: exit 0
+    restart: always
+
+  users_service:
+    image: users_service
+    build: ./UsersService
+    environment:
+      - APP_RD_ADDRESS=users_queue:6379
+      - APP_RD_AUTH=password
+      - APP_RD_DBNAME=0
+      - APP_SETTINGS=project.config.DevelopmentConfig
+      - DATABASE_URL=postgres://postgres:postgres@users_service_db:5432/users_dev?sslmode=disable
+    depends_on:
+      - users_service_db
+      - users_queue
+    links:
+      - users_service_db
+      - users_queue
+
+  # ----------------------
+  #  sport news service
+  # ----------------------
+
+  # querydb_sport:
+  #   image: querydb_sport
+  #   build: ./SportNewsService/query_db/
+  #   ports:
+  #     - "27017:27017"
+  #   healthcheck:
+  #     test: exit 0
+  #   restart: always
+
+  # sport_news_service:
+  #   image: sport_news_service
+  #   build: ./SportNewsService
+  #   volumes:
+  #     - './SportNewsService:/app'
+  #   environment:
+  #     - QUERYBD_HOST=mongodb://querydb_sport:27017/
+  #   depends_on:
+  #     - querydb_sport
+  #   links:
+  #     - querydb_sport
+  #   restart: always
+
+
+  # ----------------------
+  # 
+  # ----------------------
+
+  # ----------------------
+  # 
+  # ----------------------
+
+
+  # ----------------------
+  # 
+  # ----------------------
+
+  # ----------------------
+  # nginx 
+  # ----------------------
+  loadbalance:
+    build: ./nginx
+    ports:
+      - "80:80"
+    links:
+      - users_service
+    restart: always
