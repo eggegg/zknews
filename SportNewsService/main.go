@@ -1,36 +1,42 @@
 package main
 
 import (
-	"log"
 	"time"
+	// "log"
+	"flag"
+	// "os"
 
-	"github.com/kelseyhightower/envconfig"
-	"github.com/tinrab/retry"
-	"github.com/tinrab/spidey/catalog"
+	mgo "gopkg.in/mgo.v2"
+
 )
 
-type Config struct {
-	DatabaseURL string `envconfig:"DATABASE_URL"`
-}
 
 func main() {
-	var cfg Config
-	err := envconfig.Process("", &cfg)
-	if err != nil {
-		log.Fatal(err)
+	
+	var connectionString string
+	flag.StringVar(&connectionString, "querydb_host", "localhost:27017", "Mongo Address") 
+	//os.Getenv("QUERYBD_HOST")
+	
+	flag.Parse()
+
+
+	host := []string{
+		connectionString,
 	}
-
-	var r catalog.Repository
-	retry.ForeverSleep(2*time.Second, func(_ int) (err error) {
-		r, err = catalog.NewElasticRepository(cfg.DatabaseURL)
-		if err != nil {
-			log.Println(err)
-		}
-		return
+	session, err := mgo.DialWithInfo(&mgo.DialInfo{
+		Addrs: host,
+		Direct: true,
+		Timeout: 1 * time.Second,
 	})
-	defer r.Close()
+	session.SetMode(mgo.Monotonic, true)
+	if err != nil{
+		panic(err)
+	}
+	defer session.Close()
 
-	log.Println("Listening on port 8080...")
-	s := catalog.NewService(r)
-	log.Fatal(catalog.ListenGRPC(s, 8080))
+	a := App{}
+	a.Initialize(session)
+	a.initializeRoutes()
+	go a.RunGRPServer()
+	a.Run(":3000")
 }
