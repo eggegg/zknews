@@ -8,7 +8,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
-	raven "github.com/getsentry/raven-go"
 )
 
 const (
@@ -19,7 +18,6 @@ const (
 )
 
 func init() {
-	raven.SetDSN("change by keep")
 }
 
 func main() {

@@ -16,6 +16,9 @@ func main() {
 	var connectionString string
 	flag.StringVar(&connectionString, "querydb_host", "localhost:27017", "Mongo Address") 
 	//os.Getenv("QUERYBD_HOST")
+
+	var eventURL string
+	flag.StringVar(&eventURL, "event_url","localhost:50051", "event store grpc url")
 	
 	flag.Parse()
 
@@ -37,6 +40,6 @@ func main() {
 	a := App{}
 	a.Initialize(session)
 	a.initializeRoutes()
-	go a.RunGRPServer()
+	go a.RunGRPServer(eventURL)
 	a.Run(":3000")
 }

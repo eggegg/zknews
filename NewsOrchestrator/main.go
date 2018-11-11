@@ -1,24 +1,30 @@
 package main
 
 import (
-	"log"
+	"flag"
+	// "log"
 )
 
 
 func main() {
-		
-	// connectionString := os.Getenv("DATABASE_URL")
 
-	// db, err := sqlx.Open("postgres", connectionString)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	var httpPort string
+	var SportRPCAddress string
+	var SearchPRCAddress string
 
-	log.Println("start service....")
+	flag.StringVar(&httpPort, "http_port", "3100", "http port") 
+	
+	flag.StringVar(&SportRPCAddress, "Sport rpc address", "localhost:8080", "http port") 
+	flag.StringVar(&SearchPRCAddress, "search rpc address", "localhost:50061", "http port") 
+	
+	
+	flag.Parse()
+
+
 	
 
 	a := App{}
-	a.Initialize()
+	a.Initialize(SportRPCAddress, SearchPRCAddress)
 	a.initializeRoutes()
-	a.Run(":3000")
+	a.Run(httpPort)
 }

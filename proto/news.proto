@@ -1,0 +1,60 @@
+syntax = "proto3";
+package pb;
+
+
+message News {
+    string id = 1;
+    string title = 2;
+    string content = 3;
+    string author = 4;
+    string news_type = 5;
+    repeated string tags = 6; 
+}
+
+message PostNewsRequest {
+    string title = 2;
+    string content = 3;
+    string author = 4;
+    string news_type = 5;
+    repeated string tags = 6; 
+}
+
+message PostNewsResponse {
+    News news = 1;
+}
+
+message GetNewsRequest {
+    string news_type = 1;
+    string id = 2;
+}
+
+message GetNewsResponse {
+    News news = 1;
+}
+
+message GetAllNewsRequest {
+    string news_type = 1;
+    int32 skip = 2;
+    int32 take = 3;
+}
+
+message GetAllNewsResponse {
+    repeated News allnews = 1;
+}
+
+message SearchNewsRequest{
+    string query = 1;
+    int32 skip = 2;
+    int32 take = 3;
+}
+
+message SearchNewsResponse{
+    repeated News allnews = 1;
+}
+
+service NewsService {
+    rpc PostNews (PostNewsRequest) returns (PostNewsResponse) {}
+    rpc GetNews (GetNewsRequest) returns (GetNewsResponse){}
+    rpc GetAllNews (GetAllNewsRequest) returns (GetAllNewsResponse) {}
+    rpc SearchNews (SearchNewsRequest) returns (SearchNewsResponse) {}
+}

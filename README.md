@@ -13,6 +13,13 @@
 start nats-streaming
 docker run -d -p 4222:4222 -p 8222:8222 nats-streaming
 
+start elasticsearch
+docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.2.4
+curl http://localhost:9200 for test
+
+
+protoc ./eventstore.proto --go_out=plugins=grpc:./pb
+protoc --go_out=plugins=grpc:. *.proto
 
 NewsOrchestrator:
     http: 

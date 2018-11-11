@@ -39,15 +39,15 @@ func (a *App) initializeRoutes() {
 }
 
 // Run grpc 
-func (a *App) RunGRPServer()  {
+func (a *App) RunGRPServer(eventURL string)  {
 	var r Repository
 	r, err := NewMongoRepository(a.Session)
 	if err != nil{
 		log.Println(err)
 	}
 	s := NewNewsService(r)
-	log.Println("GRPC Listening on port 8080...")	
-	log.Fatal(ListenGRPC(s, 8080))
+	log.Println("GRPC Listening on port 8080...,event_url", eventURL)	
+	log.Fatal(ListenGRPC(s, 8080, eventURL))
 }
 
 // Run initialize the server
